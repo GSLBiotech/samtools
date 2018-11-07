@@ -27,7 +27,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <zlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include "htslib/kstring.h"
 #include "bam.h"
 #include "htslib/kseq.h"

@@ -25,6 +25,10 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <config.h>
 
+#ifdef _MSC_VER
+  #include <msvc.h>
+#endif
+
 #include <math.h>
 #include <stdint.h>
 #include <assert.h>

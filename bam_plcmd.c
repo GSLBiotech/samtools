@@ -28,10 +28,14 @@ DEALINGS IN THE SOFTWARE.  */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+  #include <strings.h>
+#endif
+
 #include <ctype.h>
 #include <string.h>
-#include <strings.h>
 #include <limits.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -785,7 +789,9 @@ static int mpileup(mplp_conf_t *conf, int n, char **fn)
         if (data[i]->iter) hts_itr_destroy(data[i]->iter);
         free(data[i]);
     }
-    free(data); free(plp); free(n_plp);
+    free(data);
+    free( (bam_pileup1_t**) plp);
+    free(n_plp);
     free(mp_ref.ref[0]);
     free(mp_ref.ref[1]);
     return ret;

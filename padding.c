@@ -28,7 +28,11 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <string.h>
 #include <assert.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <htslib/kstring.h>
 #include <htslib/sam.h>
 #include <htslib/faidx.h>

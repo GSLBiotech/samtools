@@ -23,12 +23,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.  */
 
 #include <config.h>
-
+#include <getopt.h>
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
 
 /* File status flags (zero means OK). It's possible for more than one to be
  * set on a single file.   The final exit status is the bitwise-or of the

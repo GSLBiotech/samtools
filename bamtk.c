@@ -25,7 +25,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <config.h>
 
 #include <stdio.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <fcntl.h>
 #include <string.h>
 

@@ -30,7 +30,12 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
+
+#ifdef _MSC_VER
+  #include <msvc.h>
+#else
+  #include <unistd.h>
+#endif
 
 void dump_read(bam1_t* b) {
     printf("->core.tid:(%d)\n", b->core.tid);

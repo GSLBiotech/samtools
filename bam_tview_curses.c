@@ -45,7 +45,11 @@ DEALINGS IN THE SOFTWARE.  */
 #undef HAVE_CURSES
 #endif
 #else
-#warning "No curses library is available; tview with curses is disabled."
+  #ifdef _MSC_VER
+    #pragma warning "No curses library is available; tview with curses is disabled."
+  #else
+    #warning "No curses library is available; tview with curses is disabled."
+  #endif
 #endif
 
 #ifdef HAVE_CURSES

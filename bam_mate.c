@@ -30,7 +30,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include "htslib/thread_pool.h"
 #include "sam_opts.h"
 #include "htslib/kstring.h"

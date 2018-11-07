@@ -26,7 +26,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <config.h>
 
 #include <string.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include "htslib/faidx.h"
 #include "sam.h"
 

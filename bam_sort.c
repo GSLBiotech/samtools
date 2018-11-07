@@ -34,7 +34,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <getopt.h>
 #include <assert.h>
 #include <pthread.h>

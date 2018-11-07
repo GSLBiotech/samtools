@@ -39,7 +39,10 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <config.h>
 
-#include <unistd.h> // for isatty()
+#ifndef _MSC_VER
+  #include <unistd.h> // for isatty()
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

@@ -28,9 +28,9 @@ DEALINGS IN THE SOFTWARE.  */
 #include "stats_isize.h"
 #include <htslib/khash.h>
 
-typedef enum {IN,OUT,OTHER} isize_insert_t;
+typedef enum {STATS_IN,STATS_OUT,STATS_OTHER} isize_insert_t;
 
-static int max(int a, int b) {
+static int max_int(int a, int b) {
     if (a < b) {
         return b;
     } else {
@@ -92,7 +92,7 @@ static void sparse_set_f(isize_data_t data, int at, isize_insert_t field, uint64
             int stupid = 0;
             khint_t it = kh_put(m32, h, at, & stupid);
             kh_value(h, it) = rec;
-            a->max = max(at, a->max);
+            a->max = max_int(at, a->max);
         } else {
             fprintf(stderr, "%s\n", "Failed to allocate memory for isize_sparse_record_t");
             exit(11);
@@ -100,9 +100,9 @@ static void sparse_set_f(isize_data_t data, int at, isize_insert_t field, uint64
     } else {
         return;
     }
-    if (field == IN) {
+    if (field == STATS_IN) {
         rec->isize_inward = value;
-    } else if (field == OUT) {
+    } else if (field == STATS_OUT) {
         rec->isize_outward = value;
     } else {
         rec->isize_other = value;
@@ -110,9 +110,9 @@ static void sparse_set_f(isize_data_t data, int at, isize_insert_t field, uint64
 
 }
 
-static void sparse_set_in_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, IN, value); }
-static void sparse_set_out_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, OUT, value); }
-static void sparse_set_other_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, OTHER, value); }
+static void sparse_set_in_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, STATS_IN, value); }
+static void sparse_set_out_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, STATS_OUT, value); }
+static void sparse_set_other_f(isize_data_t data, int at, uint64_t value) { sparse_set_f(data, at, STATS_OTHER, value); }
 
 static void sparse_inc_in_f(isize_data_t data, int at) { sparse_set_in_f(data, at, sparse_in_f(data, at) + 1); }
 static void sparse_inc_out_f(isize_data_t data, int at) { sparse_set_out_f(data, at, sparse_out_f(data, at) + 1); }

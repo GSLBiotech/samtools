@@ -35,7 +35,11 @@ History:
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <errno.h>
 #include <getopt.h>

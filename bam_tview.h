@@ -29,7 +29,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <htslib/sam.h>
 #include "bam2bcf.h"

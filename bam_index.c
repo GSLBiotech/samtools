@@ -33,7 +33,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdio.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <getopt.h>
 
 #include "samtools.h"

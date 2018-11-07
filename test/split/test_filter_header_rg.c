@@ -26,7 +26,10 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include "../../bam_split.c"
 #include "../test.h"
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
 
 void setup_test_1(bam_hdr_t** hdr_in)
 {

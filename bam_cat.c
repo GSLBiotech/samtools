@@ -38,9 +38,14 @@ Illumina.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <strings.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+  #include <strings.h>
+#endif
+
+#include <getopt.h>
 
 #include "htslib/bgzf.h"
 #include "htslib/sam.h"
@@ -77,10 +82,10 @@ static int hash_s2i_inc(khash_s2i *hash, const char *str, const char *line, int 
     if (hash->a_id <= n) {
         const char **id;
         hash->a_id = (n+1)*2;
-        if (!(id = realloc(hash->id, hash->a_id*sizeof(*hash->id))))
+        if (!(id = realloc( (char**) hash->id, hash->a_id*sizeof(*hash->id))))
             return -1;
         hash->id = id;
-        if (!(id = realloc(hash->line, hash->a_id*sizeof(*hash->line))))
+        if (!(id = realloc( (char**) hash->line, hash->a_id*sizeof(*hash->line))))
             return -1;
         hash->line = id;
     }
@@ -114,9 +119,9 @@ static void hash_s2i_free(khash_s2i *hash) {
         kh_destroy(s2i, hash->h);
     }
     if (hash->id)
-        free(hash->id);
+        free( (char**) hash->id);
     if (hash->line)
-        free(hash->line);
+        free( (char**) hash->line);
 
     free(hash);
 }

@@ -30,8 +30,14 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
-#include <unistd.h>
-#include <regex.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+  #include <regex.h>
+#else
+  #include <pcre2posix.h>
+#endif
+
 #include <htslib/khash.h>
 #include <htslib/kstring.h>
 #include <htslib/cram.h>

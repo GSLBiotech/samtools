@@ -27,7 +27,11 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <stdint.h>
 #include <math.h>
 #include <zlib.h>

@@ -29,7 +29,11 @@ DEALINGS IN THE SOFTWARE
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
+
 #include <ctype.h>
 #include <time.h>
 #include <sys/stat.h>

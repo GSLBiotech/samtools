@@ -25,7 +25,12 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <config.h>
 
-#include <regex.h>
+#ifndef _MSC_VER
+  #include <regex.h>
+#else
+  #include <pcre2posix.h>
+#endif
+
 #include <assert.h>
 #include "bam_tview.h"
 #include <htslib/faidx.h>

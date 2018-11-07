@@ -35,7 +35,10 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdbool.h>
 #include <limits.h>
 #include <assert.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
 
 typedef enum {
     overwrite_all,

@@ -25,7 +25,13 @@ DEALINGS IN THE SOFTWARE.  */
 #include <config.h>
 
 #include <stdio.h>
-#include <unistd.h>
+
+#ifdef _MSC_VER
+  #include <msvc.h>
+#else
+  #include <unistd.h>
+#endif
+
 #include <zlib.h>
 #include <getopt.h>
 #include "htslib/kseq.h"

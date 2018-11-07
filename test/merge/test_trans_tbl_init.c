@@ -26,7 +26,12 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include "../../bam_sort.c"
 #include <assert.h>
-#include <regex.h>
+
+#ifndef _MSC_VER
+  #include <regex.h>
+#else
+  #include <pcre2posix.h>
+#endif
 
 typedef struct refseq_info {
     const char *name;
