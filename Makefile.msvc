@@ -27,8 +27,8 @@ LIBEXT   = lib
 LINK     = link
 AR       = ar
 CPPFLAGS =
-CFLAGS   = /MD /O2 /TC /IC:\$(TPS)\zlib\include /IC:\$(TPS)\pthreads4w\include /IC:\$(TPS)\wingetopt\include /IC:\$(TPS)\pcre2\include /DWINGETOPT_SHARED_LIB
-LDFLAGS  = /libpath:C:\$(TPS)\pcre2\lib /libpath:C:\$(TPS)\pthreads4w\lib /libpath:C:\$(TPS)\wingetopt\lib /libpath:C:\$(TPS)\zlib\lib /libpath:C:\$(TPS)\bzip2\lib /libpath:C:\$(TPS)\xz\lib
+CFLAGS   = /MD /O2 /TC /I$(TPS)\zlib\include /I$(TPS)\pthreads4w\include /I$(TPS)\wingetopt\include /I$(TPS)\pcre2\include /DWINGETOPT_SHARED_LIB
+LDFLAGS  = /libpath:$(TPS)\pcre2\lib /libpath:$(TPS)\pthreads4w\lib /libpath:$(TPS)\wingetopt\lib /libpath:$(TPS)\zlib\lib /libpath:$(TPS)\bzip2\lib /libpath:$(TPS)\xz\lib
 LIBS     = ws2_32.lib pcre2-posix.lib pcre2-8.lib zlib.lib pthreadVC2.lib wingetopt.lib libbz2.lib liblzma.lib
 
 LZ4DIR   = lz4
