@@ -27,8 +27,8 @@ LIBEXT   = lib
 LINK     = link
 AR       = ar
 CPPFLAGS =
-CFLAGS   = /MT /O2 /TC /IC:\3ps\zlib\static\include /IC:\3ps\pthreads4w\static\include /IC:\3ps\wingetopt\static\include /IC:\3ps\pcre2\static\include /DPTW32_STATIC_LIB /DLZMA_API_STATIC /DPCRE2_STATIC
-LDFLAGS  = /libpath:C:\3ps\pcre2\static\lib /libpath:C:\3ps\pthreads4w\static\lib /libpath:C:\3ps\wingetopt\static\lib /libpath:C:\3ps\zlib\static\lib /libpath:C:\3ps\bzip2\static\lib /libpath:C:\3ps\xz\static\lib 
+CFLAGS   = /MT /O2 /TC /IC:\$(TPS)\zlib\static\include /IC:\$(TPS)\pthreads4w\static\include /IC:\$(TPS)\wingetopt\static\include /IC:\$(TPS)\pcre2\static\include /DPTW32_STATIC_LIB /DLZMA_API_STATIC /DPCRE2_STATIC
+LDFLAGS  = /libpath:C:\$(TPS)\pcre2\static\lib /libpath:C:\$(TPS)\pthreads4w\static\lib /libpath:C:\$(TPS)\wingetopt\static\lib /libpath:C:\$(TPS)\zlib\static\lib /libpath:C:\$(TPS)\bzip2\static\lib /libpath:C:\$(TPS)\xz\static\lib 
 LIBS     = ws2_32.lib pcre2-posix.lib pcre2-8.lib zlib.lib pthreadVC2.lib wingetopt.lib libbz2.lib liblzma.lib
 
 LZ4DIR   = lz4
@@ -143,7 +143,7 @@ libbam.$(LIBEXT):$(LOBJS)
 
 
 samtools: $(AOBJS) $(LZ4OBJS) libbam.$(LIBEXT) libst.$(LIBEXT) $(HTSLIB)
-	link $(ALL_LDFLAGS) /out:$@.exe $(AOBJS) $(LZ4OBJS) libbam.$(LIBEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(CURSES_LIB) -lm $(ALL_LIBS) 
+	link $(ALL_LDFLAGS) /out:$@.exe $(AOBJS) $(LZ4OBJS) libbam.$(LIBEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(CURSES_LIB) -lm $(ALL_LIBS)
 
 # For building samtools and its test suite only: NOT to be installed.
 libst.$(LIBEXT): $(LIBST_OBJS)
@@ -234,10 +234,10 @@ test/merge/test_bam_translate: test/merge/test_bam_translate.$(OBJEXT) test/test
 	link $(ALL_LDFLAGS) /out:$@ test/merge/test_bam_translate.$(OBJEXT) test/test.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS)
 
 test/merge/test_rtrans_build: test/merge/test_rtrans_build.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB)
-	link $(ALL_LDFLAGS) /out:$@ test/merge/test_rtrans_build.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS) 
+	link $(ALL_LDFLAGS) /out:$@ test/merge/test_rtrans_build.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS)
 
 test/merge/test_trans_tbl_init: test/merge/test_trans_tbl_init.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB)
-	link $(ALL_LDFLAGS) /out:$@ test/merge/test_trans_tbl_init.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS) 
+	link $(ALL_LDFLAGS) /out:$@ test/merge/test_trans_tbl_init.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS)
 
 test/split/test_count_rg: test/split/test_count_rg.$(OBJEXT) test/test.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB)
 	link $(ALL_LDFLAGS) /out:$@ test/split/test_count_rg.$(OBJEXT) test/test.$(OBJEXT) libst.$(LIBEXT) $(HTSLIB_LIB) $(ALL_LIBS)
