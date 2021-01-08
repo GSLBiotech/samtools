@@ -1,6 +1,6 @@
 # Configure script for samtools, utilities for Sequence Alignment/Map files.
 #
-#    Copyright (C) 2015 Genome Research Ltd.
+#    Copyright (C) 2015, 2017, 2019 Genome Research Ltd.
 #
 #    Author: John Marshall <jm18@sanger.ac.uk>
 #
@@ -29,7 +29,8 @@ AC_PREREQ([2.63])  dnl This version introduced 4-argument AC_CHECK_HEADER
 AC_CONFIG_SRCDIR([bamtk.c])
 AC_CONFIG_HEADERS([config.h])
 
-m4_include([m4/ax_with_curses.m4])
+m4_include([m4/hts_prog_cc_warnings.m4])
+m4_include([m4/hts_with_curses.m4])
 m4_include([m4/ax_with_htslib.m4])
 
 dnl Copyright notice to be copied into the generated configure script
@@ -49,7 +50,14 @@ AH_TOP([/* If you use configure, this file provides @%:@defines reflecting your
    the PACKAGE_* defines are unused and are overridden by the more
    accurate PACKAGE_VERSION as computed by the Makefile.  */])
 
+AC_PROG_AWK
 AC_PROG_CC
+
+dnl Turn on compiler warnings, if possible
+HTS_PROG_CC_WARNINGS
+dnl Flags to treat warnings as errors.  These need to be applied to CFLAGS
+dnl later as they can interfere with some of the tests (notably AC_SEARCH_LIBS)
+HTS_PROG_CC_WERROR(hts_late_cflags)
 
 AC_SYS_LARGEFILE
 
@@ -80,7 +88,7 @@ AC_ARG_WITH([curses],
                   [omit curses support, so no curses library needed])])
 
 if test "$with_curses" != no; then
-  AX_WITH_CURSES
+  HTS_WITH_CURSES
   if test "$ax_cv_curses" != yes; then
     AC_MSG_ERROR([curses development files not found
 
@@ -129,9 +137,12 @@ case $host_alias in
     # This also sets __USE_MINGW_ANSI_STDIO which in turn makes PRId64,
     # %lld and %z printf formats work.  It also enforces the snprintf to
     # be C99 compliant so it returns the correct values (in kstring.c).
-    CPPFLAGS="$CPPCFLAGS -D_POSIX_C_SOURCE=600"
+    CPPFLAGS="$CPPCFLAGS -D_XOPEN_SOURCE=600"
     ;;
 esac
+
+dnl Apply value from HTS_PROG_CC_WERROR (if set)
+AS_IF([test "x$hts_late_cflags" != x],[CFLAGS="$CFLAGS $hts_late_cflags"])
 
 AC_CONFIG_FILES([config.mk])
 AC_OUTPUT

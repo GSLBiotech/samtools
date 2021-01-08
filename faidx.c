@@ -1,6 +1,6 @@
 /*  faidx.c -- faidx subcommand.
 
-    Copyright (C) 2008, 2009, 2013, 2016, 2018 Genome Research Ltd.
+    Copyright (C) 2008, 2009, 2013, 2016, 2018-2020 Genome Research Ltd.
     Portions copyright (C) 2011 Broad Institute.
 
     Author: Heng Li <lh3@sanger.ac.uk>
@@ -71,9 +71,9 @@ static unsigned char comp_base[256] = {
 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255,
 };
 
-static void reverse_complement(char *str, int len) {
+static void reverse_complement(char *str, const hts_pos_t len) {
     char c;
-    int i = 0, j = len - 1;
+    hts_pos_t i = 0, j = len - 1;
 
     while (i <= j) {
         c = str[i];
@@ -84,10 +84,9 @@ static void reverse_complement(char *str, int len) {
     }
 }
 
-
-static void reverse(char *str, int len) {
+static void reverse(char *str, const hts_pos_t len) {
     char c;
-    int i = 0, j = len - 1;
+    hts_pos_t i = 0, j = len - 1;
 
     while (i < j) {
         c = str[i];
@@ -99,9 +98,10 @@ static void reverse(char *str, int len) {
 }
 
 
-static int write_line(FILE *file, const char *line, const char *name, const int ignore,
-                      const int length, const int seq_len) {
-    int beg, end;
+static int write_line(faidx_t *faid, FILE *file, const char *line, const char *name,
+                      const int ignore, const int length, const hts_pos_t seq_len) {
+    int id;
+    hts_pos_t beg, end;
 
     if (seq_len < 0) {
         fprintf(stderr, "[faidx] Failed to fetch sequence in %s\n", name);
@@ -113,15 +113,16 @@ static int write_line(FILE *file, const char *line, const char *name, const int 
         }
     } else if (seq_len == 0) {
         fprintf(stderr, "[faidx] Zero length sequence: %s\n", name);
-    } else if (hts_parse_reg(name, &beg, &end) && (end < INT_MAX) && (seq_len != end - beg)) {
+    } else if (fai_parse_region(faid, name, &id, &beg, &end, 0)
+               && (end < INT_MAX) && (seq_len != end - beg)) {
         fprintf(stderr, "[faidx] Truncated sequence: %s\n", name);
     }
 
-    size_t i, seq_sz = seq_len;
+    hts_pos_t i, seq_sz = seq_len;
 
     for (i = 0; i < seq_sz; i += length)
     {
-        size_t len = i + length < seq_sz ? length : seq_sz - i;
+        hts_pos_t len = i + length < seq_sz ? length : seq_sz - i;
         if (fwrite(line + i, 1, len, file) < len ||
             fputc('\n', file) == EOF) {
             print_error_errno("faidx", "failed to write output");
@@ -137,8 +138,8 @@ static int write_output(faidx_t *faid, FILE *file, const char *name, const int i
                         const int length, const int rev,
                         const char *pos_strand_name, const char *neg_strand_name,
                         enum fai_format_options format) {
-    int seq_len;
-    char *seq = fai_fetch(faid, name, &seq_len);
+    hts_pos_t seq_len;
+    char *seq = fai_fetch64(faid, name, &seq_len);
 
     if (format == FAI_FASTA) {
         fprintf(file, ">%s%s\n", name, rev ? neg_strand_name : pos_strand_name);
@@ -150,7 +151,8 @@ static int write_output(faidx_t *faid, FILE *file, const char *name, const int i
         reverse_complement(seq, seq_len);
     }
 
-    if (write_line(file, seq, name, ignore, length, seq_len) == EXIT_FAILURE) {
+    if (write_line(faid, file, seq, name, ignore, length, seq_len)
+        == EXIT_FAILURE) {
         free(seq);
         return EXIT_FAILURE;
     }
@@ -160,14 +162,15 @@ static int write_output(faidx_t *faid, FILE *file, const char *name, const int i
     if (format == FAI_FASTQ) {
         fprintf(file, "+\n");
 
-        char *qual = fai_fetchqual(faid, name, &seq_len);
+        char *qual = fai_fetchqual64(faid, name, &seq_len);
 
         if (rev && seq_len > 0) {
             reverse(qual, seq_len);
         }
 
-        if (write_line(file, qual, name, ignore, length, seq_len) == EXIT_FAILURE) {
-            free(seq);
+        if (write_line(faid, file, qual, name, ignore, length, seq_len)
+            == EXIT_FAILURE) {
+            free(qual);
             return EXIT_FAILURE;
         }
 
@@ -199,14 +202,16 @@ static int read_regions_from_file(faidx_t *faid, hFILE *in_file, FILE *file, con
 
 static int usage(FILE *fp, enum fai_format_options format, int exit_status)
 {
-    char *tool, *file_type;
+    char *tool, *file_type, *index_name;
 
     if (format == FAI_FASTA) {
         tool = "faidx <file.fa|file.fa.gz>";
         file_type = "FASTA";
+        index_name = "file.fa";
     } else {
         tool = "fqidx <file.fq|file.fq.gz>";
         file_type = "FASTQ";
+        index_name = "file.fq";
     }
 
     fprintf(fp, "Usage: samtools %s [<reg> [...]]\n", tool);
@@ -220,8 +225,10 @@ static int usage(FILE *fp, enum fai_format_options format, int exit_status)
                 "                          TYPE = rc   for /rc on negative strand (default)\n"
                 "                                 no   for no strand indicator\n"
                 "                                 sign for (+) / (-)\n"
-                "                                 custom,<pos>,<neg> for custom indicator\n",
-                file_type, file_type);
+                "                                 custom,<pos>,<neg> for custom indicator\n"
+                "     --fai-idx      FILE  name of the index file (default %s.fai).\n"
+                "     --gzi-idx      FILE  name of compressed file index (default %s.gz.gzi).\n",
+                file_type, file_type, index_name, index_name);
 
 
     if (format == FAI_FASTA) {
@@ -242,6 +249,8 @@ int faidx_core(int argc, char *argv[], enum fai_format_options format)
     char *pos_strand_name = ""; // Extension to add to name for +ve strand
     char *neg_strand_name = "/rc"; // Extension to add to name for -ve strand
     char *strand_names = NULL; // Used for custom strand annotation
+    char *fai_name = NULL; // specified index name
+    char *gzi_name = NULL; // specified compressed index name
     FILE* file_out = stdout;/* output stream */
 
     static const struct option lopts[] = {
@@ -253,6 +262,8 @@ int faidx_core(int argc, char *argv[], enum fai_format_options format)
         { "fastq", no_argument,              NULL, 'f' },
         { "reverse-complement", no_argument, NULL, 'i' },
         { "mark-strand", required_argument, NULL, 1000 },
+        { "fai-idx", required_argument,     NULL, 1001 },
+        { "gzi-idx", required_argument,     NULL, 1002 },
         { NULL, 0, NULL, 0 }
     };
 
@@ -301,6 +312,8 @@ int faidx_core(int argc, char *argv[], enum fai_format_options format)
                     return usage(stderr, format, EXIT_FAILURE);
                 }
                 break;
+            case 1001: fai_name = optarg; break;
+            case 1002: gzi_name = optarg; break;
             default:  break;
         }
     }
@@ -308,19 +321,40 @@ int faidx_core(int argc, char *argv[], enum fai_format_options format)
     if ( argc==optind )
         return usage(stdout, format, EXIT_SUCCESS);
 
-    if ( optind+1 == argc && !region_file)
-    {
-        if (fai_build(argv[optind]) != 0) {
-            fprintf(stderr, "[faidx] Could not build fai index %s.fai\n", argv[optind]);
+    if (optind+1 == argc && !region_file) {
+        if (output_file && !fai_name)
+            fai_name = output_file;
+
+        if (fai_build3(argv[optind], fai_name, gzi_name) != 0) {
+            if (fai_name)
+                fprintf(stderr, "[faidx] Could not build fai index %s", fai_name);
+            else
+                fprintf(stderr, "[faidx] Could not build fai index %s.fai", argv[optind]);
+
+            if (gzi_name)
+                fprintf(stderr, " or compressed index %s\n", gzi_name);
+            else
+                fprintf(stderr, "\n");
+
             return EXIT_FAILURE;
         }
+
         return 0;
     }
 
-    faidx_t *fai = fai_load_format(argv[optind], format);
+    faidx_t *fai = fai_load3_format(argv[optind], fai_name, gzi_name, FAI_CREATE, format);
 
-    if ( !fai ) {
-        fprintf(stderr, "[faidx] Could not load fai index of %s\n", argv[optind]);
+    if (!fai) {
+        if (fai_name)
+            fprintf(stderr, "[faidx] Could not load fai index %s", fai_name);
+        else
+            fprintf(stderr, "[faidx] Could not build fai index %s.fai", argv[optind]);
+
+        if (gzi_name)
+            fprintf(stderr, " or compressed index %s\n", gzi_name);
+        else
+            fprintf(stderr, "\n");
+
         return EXIT_FAILURE;
     }
 

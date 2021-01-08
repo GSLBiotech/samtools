@@ -1,6 +1,6 @@
 /*  test/merge/test_bam_translate.c -- header merging test harness.
 
-    Copyright (C) 2013, 2014 Genome Research Ltd.
+    Copyright (C) 2013, 2014-2015 Genome Research Ltd.
 
     Author: Martin O. Pollard <mp15@sanger.ac.uk>
 
@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #ifdef _MSC_VER
   #include <msvc.h>
@@ -39,7 +40,7 @@ DEALINGS IN THE SOFTWARE.  */
 
 void dump_read(bam1_t* b) {
     printf("->core.tid:(%d)\n", b->core.tid);
-    printf("->core.pos:(%d)\n", b->core.pos);
+    printf("->core.pos:(%"PRId64")\n", (int64_t) b->core.pos);
     printf("->core.bin:(%d)\n", b->core.bin);
     printf("->core.qual:(%d)\n", b->core.qual);
     printf("->core.l_qname:(%d)\n", b->core.l_qname);
@@ -47,8 +48,8 @@ void dump_read(bam1_t* b) {
     printf("->core.n_cigar:(%d)\n", b->core.n_cigar);
     printf("->core.l_qseq:(%d)\n", b->core.l_qseq);
     printf("->core.mtid:(%d)\n", b->core.mtid);
-    printf("->core.mpos:(%d)\n", b->core.mpos);
-    printf("->core.isize:(%d)\n", b->core.isize);
+    printf("->core.mpos:(%"PRId64")\n", (int64_t) b->core.mpos);
+    printf("->core.isize:(%"PRId64")\n", (int64_t) b->core.isize);
     if (b->data) {
         printf("->data:");
         int i;
@@ -151,7 +152,7 @@ void setup_test_2(bam1_t** b_in, trans_tbl_t* tbl) {
     tbl->tid_trans[3] = 8;
     int in_there = 0;
     khiter_t iter = kh_put(c2c, tbl->rg_trans, strdup("hello"), &in_there);
-    kh_value(tbl->rg_trans, iter) = strdup("goodbye");
+    kh_value(tbl->rg_trans, iter) = "goodbye";
 
     b->core.tid = 0;
     b->core.pos = 1334;
@@ -191,7 +192,7 @@ void setup_test_3(bam1_t** b_in, trans_tbl_t* tbl) {
     tbl->tid_trans[3] = 8;
     int in_there = 0;
     khiter_t iter = kh_put(c2c, tbl->pg_trans, strdup("hello"), &in_there);
-    kh_value(tbl->pg_trans,iter) = strdup("goodbye");
+    kh_value(tbl->pg_trans,iter) = "goodbye";
 
 
     b->core.tid = 0;
@@ -307,9 +308,9 @@ void setup_test_6(bam1_t** b_in, trans_tbl_t* tbl) {
     tbl->tid_trans[3] = 8;
     int in_there = 0;
     khiter_t iter_rg = kh_put(c2c, tbl->rg_trans, strdup("hello"), &in_there);
-    kh_value(tbl->rg_trans, iter_rg) = strdup("goodbye");
+    kh_value(tbl->rg_trans, iter_rg) = "goodbye";
     khiter_t iter_pg = kh_put(c2c, tbl->pg_trans, strdup("quail"), &in_there);
-    kh_value(tbl->pg_trans, iter_pg) = strdup("bird");
+    kh_value(tbl->pg_trans, iter_pg) = "bird";
 
 
     b->core.tid = 0;
