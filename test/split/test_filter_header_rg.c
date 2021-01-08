@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include "samtools.h"
 #include <string.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include "htslib/kstring.h"
 
 #ifndef _MSC_VER
@@ -50,7 +51,8 @@ int line_cmp(const void *av, const void *bv) {
 bool hdrcmp(const char *hdr1, const char *hdr2) {
     size_t nl1, nl2, count1 = 0, count2 = 0, i;
     const char *l;
-    const char **lines1, **lines2;
+    const char **lines1;
+    const char **lines2;
     int res = 0;
 
     // First line should be @HD
@@ -68,23 +70,24 @@ bool hdrcmp(const char *hdr1, const char *hdr2) {
     lines1 = malloc(count1 * sizeof(*lines1));
     if (!lines1) return false;
     lines2 = malloc(count2 * sizeof(*lines2));
-    if (!lines2) { free(lines1); return false; }
+    if (!lines2)
+    { free((char**) lines1); return false; }
 
     for (i = 0, l = hdr1 + nl1; *l != '\0'; l += strcspn(l, "\n"))
         lines1[i++] = ++l;
     for (i = 0, l = hdr2 + nl2; *l != '\0'; l += strcspn(l, "\n"))
         lines2[i++] = ++l;
 
-    qsort(lines1, count1, sizeof(*lines1), line_cmp);
-    qsort(lines2, count2, sizeof(*lines2), line_cmp);
+    qsort((char**)lines1, count1, sizeof(*lines1), line_cmp);
+    qsort((char**)lines2, count2, sizeof(*lines2), line_cmp);
 
     for (i = 0; i < count1; i++) {
         res = line_cmp(&lines1[i], &lines2[i]);
         if (res != 0) break;
     }
 
-    free(lines1);
-    free(lines2);
+    free((char**)lines1);
+    free((char**)lines2);
 
     return res?false:true;
 }

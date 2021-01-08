@@ -29,7 +29,12 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdlib.h>
 #include <assert.h>
 #include <getopt.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#else
+  #include "sam_msvc.h"
+#endif
 
 #include "htslib/bgzf.h"
 #include "htslib/sam.h"

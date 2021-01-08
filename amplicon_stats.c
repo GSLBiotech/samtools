@@ -40,8 +40,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <string.h>
 #include <inttypes.h>
 #include <getopt.h>
-#include <unistd.h>
 #include <math.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+#endif
 
 #include <htslib/sam.h>
 #include <htslib/khash.h>

@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE
 
 #ifndef _MSC_VER
   #include <unistd.h>
+#else
+  #define WIN32_LEAN_AND_MEAN
 #endif
 
 #include <stdlib.h>

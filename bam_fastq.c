@@ -27,12 +27,15 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+  #include <unistd.h>
+  #include <strings.h>
+#endif
 
 #include "htslib/sam.h"
 #include "htslib/klist.h"
