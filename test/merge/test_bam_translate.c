@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include <inttypes.h>
 
 #ifdef _MSC_VER
-  #include <msvc.h>
+  #include "htslib/hts_msvc.h"
 #else
   #include <unistd.h>
 #endif
